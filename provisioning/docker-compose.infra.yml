@@ -1,0 +1,82 @@
+# docker-compose.infra.yml — focuscall.ai Webhook Receiver Infrastructure
+#
+# Starts the FastAPI webhook receiver that listens for provisioning requests
+# from the Supabase Edge Function and manages ZeroClaw Docker containers.
+#
+# Usage:
+#   WEBHOOK_SECRET=$(openssl rand -hex 32) docker compose -f docker-compose.infra.yml up -d
+#
+# Requirements:
+#   - /opt/focuscall/registry.json must exist (initialize with: echo '{"next_port":42000,"instances":{}}' > /opt/focuscall/registry.json)
+#   - /opt/focuscall/workspaces/ must exist
+#   - zeroclaw:latest image must be built: docker build -t zeroclaw:latest .
+
+version: "3.9"
+
+services:
+  webhook-receiver:
+    image: python:3.11-slim
+    container_name: focuscall-webhook-receiver
+    restart: unless-stopped
+
+    # Install Python dependencies at startup
+    # In production: build a Dockerfile.webhook instead for faster startup
+    command: >
+      sh -c "pip install --quiet fastapi uvicorn[standard] docker filelock pydantic &&
+             python /app/webhook-receiver.py"
+
+    ports:
+      # Only bind to localhost — nginx proxies /provision to this port
+      - "127.0.0.1:9000:9000"
+
+    volumes:
+      # Docker socket: allows receiver to create/stop containers
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      # Shared data directory: workspaces + registry
+      - /opt/focuscall:/opt/focuscall
+
+      # Application source files (mounted read-only — code, not data)
+      - ./webhook-receiver.py:/app/webhook-receiver.py:ro
+      - ./provision.py:/app/provision.py:ro
+      - ./config.toml.tmpl:/app/config.toml.tmpl:ro
+
+    environment:
+      # Required: must be set in environment or .env file
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+
+      # Registry and workspace paths (match volume mounts above)
+      - REGISTRY_PATH=/opt/focuscall/registry.json
+      - WORKSPACE_BASE=/opt/focuscall/workspaces
+
+      # Config template path (mounted above)
+      - CONFIG_TEMPLATE_PATH=/app/config.toml.tmpl
+
+    # host network mode: allows webhook-receiver to reach container IPs
+    # for health checks (containers get IPs in Docker bridge network).
+    # If bridge networking is preferred, set network_mode: bridge and
+    # adjust health-check URL in provision.py accordingly.
+    network_mode: host
+
+    # Resource limits for the receiver itself (lightweight)
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.5"
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+# No named volumes needed — all data lives under /opt/focuscall (host bind mounts)
+# No separate network needed — network_mode: host for container IP access

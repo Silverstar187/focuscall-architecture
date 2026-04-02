@@ -1,0 +1,66 @@
+# Template fuer ZeroClaw config. Keys kommen aus ENV, nicht aus dieser Datei.
+# Variablen werden von provision.py via string.Template ersetzt: $USER_ID, $AGENT_ID, $PORT, $LLM_PROVIDER
+#
+# Keys (LLM API key, bot token) werden NICHT in diese Datei geschrieben.
+# Sie werden als Docker ENV-Variablen an den Container uebergeben:
+#   ZEROCLAW_API_KEY      — LLM API key (provider-spezifisch)
+#   TELEGRAM_BOT_TOKEN    — Telegram bot token
+# ZeroClaw liest diese automatisch aus ENV, wenn die Felder im config.toml fehlen.
+
+# ── Gateway ────────────────────────────────────────────────────────────────────
+[gateway]
+port   = $PORT           # Unique port assigned by provision.py (base: 42000)
+host   = "127.0.0.1"    # Localhost only — nginx proxies externally
+
+# ── Bot / Channel ──────────────────────────────────────────────────────────────
+[bot]
+channel = "telegram"
+# token: from ENV TELEGRAM_BOT_TOKEN — not written here
+
+# ── LLM ────────────────────────────────────────────────────────────────────────
+[llm]
+provider     = "$LLM_PROVIDER"   # openai | anthropic | mistral | ollama
+# api_key: from ENV ZEROCLAW_API_KEY — not written here
+# Model defaults by provider:
+#   openai:    gpt-4o-mini
+#   anthropic: claude-sonnet-4-20250514
+model        = "gpt-4o-mini"     # Override if needed; LLM provider determines availability
+temperature  = 0.7
+max_tokens   = 2048
+timeout_ms   = 30000
+
+# ── Database ───────────────────────────────────────────────────────────────────
+[database]
+path     = "/workspace/db"       # Mounted workspace dir — no secrets, only conversation data
+embedded = true                  # Use embedded SurrealDB — no external server needed
+
+# ── Session ────────────────────────────────────────────────────────────────────
+[session]
+idle_timeout_minutes     = 30    # Reset context window after 30 min of inactivity
+persist_to_db            = true  # Write session summaries to embedded SurrealDB
+context_window_messages  = 20    # Messages to keep in LLM context
+
+# ── Agent Autonomy ─────────────────────────────────────────────────────────────
+[agent]
+autonomy = "supervised"          # readonly | supervised | full
+# supervised: agent can initiate (CRON check-ins) but asks before tool actions
+
+# ── Tools ──────────────────────────────────────────────────────────────────────
+[tools]
+enabled = ["cron", "memory"]     # Enabled tools for this instance
+
+[tools.shell]
+enabled = false                  # Explicitly disabled — security: no shell access in container
+
+# ── Hands (Multi-Agent Personalities) ─────────────────────────────────────────
+[[hands.personalities]]
+name    = "ProductivityCoach"
+default = true
+system_prompt_file = "/workspace/prompts/productivity_coach.md"
+
+# ── Logging ────────────────────────────────────────────────────────────────────
+[logging]
+path            = "/workspace/logs/zeroclaw.log"
+level           = "info"         # debug | info | warn | error
+rotate          = true
+rotate_max_size_mb = 50

@@ -1,0 +1,133 @@
+#cloud-config
+# focuscall.ai — Bootstrap script for Hetzner CAX21 (ARM64, Ubuntu 24.04)
+# Runs once on first boot. After completion, server is fully configured.
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker.io
+  - docker-compose-v2
+  - python3-pip
+  - python3-venv
+  - nginx
+  - git
+  - curl
+  - jq
+
+# ── Create directory structure ─────────────────────────────────────────────────
+runcmd:
+  # Docker
+  - systemctl enable docker
+  - systemctl start docker
+
+  # focuscall directories
+  - mkdir -p /opt/focuscall/{workspaces,build,provisioning}
+  - chmod 750 /opt/focuscall
+
+  # Clone ZeroClaw source for Docker build
+  - git clone --depth 1 ${zeroclaw_repo} /opt/focuscall/build/zeroclaw-src
+
+  # Copy Dockerfile (pre-baked into this image or fetched from config repo)
+  # In production: pull from your config repo or S3
+  - |
+    cat > /opt/focuscall/build/Dockerfile << 'DOCKERFILE'
+    FROM rust:1.88-bookworm AS builder
+    RUN apt-get update && apt-get install -y --no-install-recommends \
+        git pkg-config libssl-dev ca-certificates \
+        && rm -rf /var/lib/apt/lists/*
+    COPY zeroclaw-src /build
+    WORKDIR /build
+    RUN cargo build --release
+
+    FROM debian:bookworm-slim AS runtime
+    RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates curl && rm -rf /var/lib/apt/lists/*
+    RUN groupadd -r zeroclaw && useradd -r -g zeroclaw -d /home/zeroclaw -m zeroclaw
+    COPY --from=builder /build/target/release/zeroclaw /usr/local/bin/zeroclaw
+    RUN chmod +x /usr/local/bin/zeroclaw
+    VOLUME /workspace
+    ENV ZEROCLAW_CONFIG_DIR=/workspace
+    USER zeroclaw
+    ENTRYPOINT ["zeroclaw", "daemon"]
+    DOCKERFILE
+
+  # Build ZeroClaw image (runs in background — takes ~10min on CAX21)
+  - docker build -t zeroclaw:latest /opt/focuscall/build/ &
+
+  # Python venv + deps for webhook receiver
+  - python3 -m venv /opt/focuscall/provisioning/venv
+  - /opt/focuscall/provisioning/venv/bin/pip install --quiet fastapi uvicorn docker pydantic
+
+  # Write webhook receiver files (in production: pull from config repo)
+  # webhook-receiver.py and provision.py uploaded separately via CI/CD
+
+  # Write systemd service
+  - |
+    cat > /etc/systemd/system/focuscall-webhook.service << 'SERVICE'
+    [Unit]
+    Description=focuscall.ai Webhook Receiver
+    After=docker.service network-online.target
+    Requires=docker.service
+
+    [Service]
+    Type=simple
+    WorkingDirectory=/opt/focuscall/provisioning
+    EnvironmentFile=/opt/focuscall/provisioning/.env
+    ExecStart=/opt/focuscall/provisioning/venv/bin/python webhook-receiver.py
+    Restart=always
+    RestartSec=5
+    StandardOutput=journal
+    StandardError=journal
+
+    [Install]
+    WantedBy=multi-user.target
+    SERVICE
+
+  # Write .env file with secrets
+  - |
+    cat > /opt/focuscall/provisioning/.env << EOF
+    WEBHOOK_SECRET=${webhook_secret}
+    REGISTRY_PATH=/opt/focuscall/registry.json
+    WORKSPACE_BASE=/opt/focuscall/workspaces
+    CONFIG_TEMPLATE_PATH=/opt/focuscall/provisioning/config.toml.tmpl
+    EOF
+  - chmod 600 /opt/focuscall/provisioning/.env
+
+  # nginx config for webhook receiver
+  - |
+    cat > /etc/nginx/sites-available/focuscall << 'NGINX'
+    server {
+        listen 80;
+        server_name _;
+
+        location /provision {
+            proxy_pass http://127.0.0.1:9000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_read_timeout 30s;
+        }
+
+        location /health {
+            proxy_pass http://127.0.0.1:9000/health;
+        }
+    }
+    NGINX
+  - ln -sf /etc/nginx/sites-available/focuscall /etc/nginx/sites-enabled/focuscall
+  - rm -f /etc/nginx/sites-enabled/default
+  - systemctl enable nginx
+  - systemctl restart nginx
+
+  # Enable and start webhook service (will wait for .py files to be deployed)
+  - systemctl daemon-reload
+  - systemctl enable focuscall-webhook
+
+# ── Final message ──────────────────────────────────────────────────────────────
+final_message: |
+  focuscall.ai bootstrap complete.
+  - Docker: ready
+  - Python venv: ready
+  - nginx: running on :80
+  - ZeroClaw image: building in background (~10min)
+  - Webhook receiver: waiting for provision.py deployment
+  Next: deploy provision.py + webhook-receiver.py, then start focuscall-webhook service.

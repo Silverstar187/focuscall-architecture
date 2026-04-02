@@ -44,7 +44,7 @@
 - [x] **INFRA-01**: ZeroClaw Docker Image gebaut (ARM64, v0.6.7) *(existiert)*
 - [x] **INFRA-02**: Webhook Receiver läuft auf VPS (:9000, HMAC-Validierung) *(existiert)*
 - [ ] **INFRA-03**: Webhook Receiver überlebt Server-Neustart (systemctl enable)
-- [ ] **INFRA-04**: Backend hat Tests (provision.py, webhook-receiver.py)
+- [x] **INFRA-04**: Backend hat Tests (provision.py, webhook-receiver.py)
 
 ## v2 Requirements (Milestone 2+)
 
@@ -107,7 +107,7 @@
 | INFRA-01 | — | ✓ Complete |
 | INFRA-02 | — | ✓ Complete |
 | INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 20 total

@@ -30,7 +30,7 @@ from login to a live, responding Telegram bot in under 5 minutes.
 **Plans:** 2 plans
 Plans:
 - [ ] 01-01-PLAN.md — Fix .env.local, enable systemd persistence, verify Supabase RLS
-- [ ] 01-02-PLAN.md — Create pytest test suite for provision.py and webhook-receiver.py
+- [x] 01-02-PLAN.md — Create pytest test suite for provision.py and webhook-receiver.py
 
 ### Phase 2: AI Generation Pipeline
 **Goal**: User describes an agent (text or voice) and gets all 5 ZeroClaw config files generated and saved

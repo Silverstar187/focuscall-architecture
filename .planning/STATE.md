@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-infrastructure-baseline-02-PLAN.md
-last_updated: "2026-04-02T21:02:03.189Z"
+status: verifying
+stopped_at: Completed 01-infrastructure-baseline-01-PLAN.md
+last_updated: "2026-04-02T21:07:44.372Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 
 Phase: 01 (infrastructure-baseline) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Recent Trend:** No data yet
 | Phase 01-infrastructure-baseline P02 | 8 | 3 tasks | 4 files |
+| Phase 01-infrastructure-baseline P01 | 15min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Recent decisions affecting current work:
 - Keys security: Keys travel via Supabase Vault → Docker ENV only — never written to VPS disk
 - [Phase 01-infrastructure-baseline]: importlib.import_module for hyphenated filename webhook-receiver.py; patch.object for importlib modules
 - [Phase 01-infrastructure-baseline]: provision_env patches both os.environ and module-level globals because provision.py reads them at import time
+- [Phase 01-infrastructure-baseline]: Use direct IP (91.99.209.45) for VPS_WEBHOOK_URL — DNS name vps.focuscall.ai was unresolvable
+- [Phase 01-infrastructure-baseline]: Supabase ALL-cmd RLS policy on user_agents already covers all operations — no new policies needed
 
 ### Pending Todos
 
@@ -73,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T21:02:03.182Z
-Stopped at: Completed 01-infrastructure-baseline-02-PLAN.md
+Last session: 2026-04-02T21:07:44.365Z
+Stopped at: Completed 01-infrastructure-baseline-01-PLAN.md
 Resume file: None

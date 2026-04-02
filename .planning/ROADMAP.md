@@ -10,7 +10,7 @@ from login to a live, responding Telegram bot in under 5 minutes.
 
 ## Phases
 
-- [ ] **Phase 1: Infrastructure Baseline** - Fix ENV vars, enable systemd persistence, backend tests, complete agent list profile
+- [x] **Phase 1: Infrastructure Baseline** - Fix ENV vars, enable systemd persistence, backend tests, complete agent list profile (completed 2026-04-02)
 - [ ] **Phase 2: AI Generation Pipeline** - Fix DeepSeek 5-file output, save generated files to Supabase, complete voice flow
 - [ ] **Phase 3: Credentials & Vault** - Telegram token + LLM key input, encrypted storage in Supabase Vault
 - [ ] **Phase 4: Provisioning Integration** - Deploy button via Next.js server-side route, container starts, bot answers
@@ -27,9 +27,9 @@ from login to a live, responding Telegram bot in under 5 minutes.
   2. Running `pytest` against `provision.py` and `webhook-receiver.py` returns green (core paths covered)
   3. `.env.local` contains correct `WEBHOOK_SECRET` and `VPS_WEBHOOK_URL` values — no placeholder strings
   4. Logged-in user sees their agent list on the dashboard profile page
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 01-01-PLAN.md — Fix .env.local, enable systemd persistence, verify Supabase RLS
+- [x] 01-01-PLAN.md — Fix .env.local, enable systemd persistence, verify Supabase RLS
 - [x] 01-02-PLAN.md — Create pytest test suite for provision.py and webhook-receiver.py
 
 ### Phase 2: AI Generation Pipeline
@@ -81,7 +81,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure Baseline | 0/2 | Planning complete | - |
+| 1. Infrastructure Baseline | 2/2 | Complete   | 2026-04-02 |
 | 2. AI Generation Pipeline | 0/TBD | Not started | - |
 | 3. Credentials & Vault | 0/TBD | Not started | - |
 | 4. Provisioning Integration | 0/TBD | Not started | - |

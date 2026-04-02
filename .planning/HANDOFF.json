@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-02T20:31:55.967Z",
+  "phase": "1",
+  "phase_name": "Infrastructure Baseline",
+  "phase_dir": ".planning/phases/01-infrastructure-baseline",
+  "plan": null,
+  "task": 0,
+  "total_tasks": null,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Codebase-Map erstellt (7 Dokumente)", "status": "done"},
+    {"id": 2, "name": "GSD Projekt initialisiert (PROJECT.md, REQUIREMENTS.md, ROADMAP.md)", "status": "done"},
+    {"id": 3, "name": "Obsidian Vault synchronisiert + /obsidian Skill erstellt", "status": "done"},
+    {"id": 4, "name": "Phase 1 Verzeichnis erstellt", "status": "done"},
+    {"id": 5, "name": "Research-Agent gestartet (läuft async)", "status": "in_progress", "progress": "01-RESEARCH.md wird gerade geschrieben"}
+  ],
+  "remaining_tasks": [
+    {"id": 6, "name": "Warten auf Research-Agent Abschluss", "status": "not_started"},
+    {"id": 7, "name": "Planner-Agent starten → PLAN.md erstellen", "status": "not_started"},
+    {"id": 8, "name": "Plan-Checker-Agent → verifizieren", "status": "not_started"},
+    {"id": 9, "name": "Phase 1 ausführen (/gsd:execute-phase 1)", "status": "not_started"}
+  ],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "GSD YOLO-Modus, Standard-Granularität, alle Agenten aktiv", "rationale": "User-Wahl", "phase": "1"},
+    {"decision": "Deploy-Button nutzt direkte VPS-Route statt Edge Function", "rationale": "Edge Function noch nicht deployed", "phase": "4"},
+    {"decision": "DeepSeek generiert 5 Dateien (AGENT_CONTEXT, QUICKREF, SOUL, config.toml, System Prompt)", "rationale": "ZeroClaw benötigt alle 5 für vollständigen Agent", "phase": "2"},
+    {"decision": "Obsidian MCP ersetzt durch /obsidian curl-Skill", "rationale": "MCP-Startup 30 Sek (npx -y), curl sofort", "phase": "0"}
+  ],
+  "uncommitted_files": [".planning/phases/", ".claude/", ".kimi/"],
+  "next_action": "Prüfe ob 01-RESEARCH.md existiert, dann Planner starten",
+  "context_notes": "Brownfield-Projekt. Infrastruktur läuft bereits. Phase 1 = Aufräumen: systemctl enable, pytest, .env.local, AUTH-03. Research-Agent läuft noch."
+}

@@ -1,66 +1,54 @@
-# Template fuer ZeroClaw config. Keys kommen aus ENV, nicht aus dieser Datei.
-# Variablen werden von provision.py via string.Template ersetzt: $USER_ID, $AGENT_ID, $PORT, $LLM_PROVIDER
+# focuscall.ai — ZeroClaw config template
+# Variables replaced by provision.py: $USER_ID $AGENT_ID $PORT $LLM_PROVIDER
 #
-# Keys (LLM API key, bot token) werden NICHT in diese Datei geschrieben.
-# Sie werden als Docker ENV-Variablen an den Container uebergeben:
-#   ZEROCLAW_API_KEY      — LLM API key (provider-spezifisch)
-#   TELEGRAM_BOT_TOKEN    — Telegram bot token
-# ZeroClaw liest diese automatisch aus ENV, wenn die Felder im config.toml fehlen.
+# SECURITY: Keys are NEVER written here.
+# ZeroClaw reads them from ENV vars automatically:
+#   ZEROCLAW_API_KEY      — overrides api_key
+#   TELEGRAM_BOT_TOKEN    — injected into channels_config.telegram.bot_token
+#
+# Schema source: zeroclaw config schema (v0.6.7)
+
+# ── Provider ───────────────────────────────────────────────────────────────────
+default_provider = "$LLM_PROVIDER"   # openrouter | anthropic | openai | ollama
+# api_key: read from ENV ZEROCLAW_API_KEY — not written here
+
+default_model = "openai/gpt-4o-mini"   # Override per agent if needed
 
 # ── Gateway ────────────────────────────────────────────────────────────────────
 [gateway]
-port   = $PORT           # Unique port assigned by provision.py (base: 42000)
-host   = "127.0.0.1"    # Localhost only — nginx proxies externally
+host                   = "127.0.0.1"
+port                   = $PORT
+require_pairing        = false          # Disabled — Telegram bot_token is the auth
+session_persistence    = true
 
-# ── Bot / Channel ──────────────────────────────────────────────────────────────
-[bot]
-channel = "telegram"
-# token: from ENV TELEGRAM_BOT_TOKEN — not written here
+# ── Telegram Channel ───────────────────────────────────────────────────────────
+[channels_config.telegram]
+# bot_token: injected at runtime via TELEGRAM_BOT_TOKEN env var in provision.py
+bot_token     = "${TELEGRAM_BOT_TOKEN}"   # ZeroClaw reads this from ENV at startup
+allowed_users = []                        # Empty = allow all (pairing handles auth)
+stream_mode   = "multi_message"           # off | partial | multi_message
 
-# ── LLM ────────────────────────────────────────────────────────────────────────
-[llm]
-provider     = "$LLM_PROVIDER"   # openai | anthropic | mistral | ollama
-# api_key: from ENV ZEROCLAW_API_KEY — not written here
-# Model defaults by provider:
-#   openai:    gpt-4o-mini
-#   anthropic: claude-sonnet-4-20250514
-model        = "gpt-4o-mini"     # Override if needed; LLM provider determines availability
-temperature  = 0.7
-max_tokens   = 2048
-timeout_ms   = 30000
+# ── Autonomy ───────────────────────────────────────────────────────────────────
+[autonomy]
+level = "supervised"   # readonly | supervised | full
 
-# ── Database ───────────────────────────────────────────────────────────────────
-[database]
-path     = "/workspace/db"       # Mounted workspace dir — no secrets, only conversation data
-embedded = true                  # Use embedded SurrealDB — no external server needed
+# ── Shell Tool ─────────────────────────────────────────────────────────────────
+[shell_tool]
+# Disabled via autonomy — no explicit disable key needed in v0.6.7
 
-# ── Session ────────────────────────────────────────────────────────────────────
-[session]
-idle_timeout_minutes     = 30    # Reset context window after 30 min of inactivity
-persist_to_db            = true  # Write session summaries to embedded SurrealDB
-context_window_messages  = 20    # Messages to keep in LLM context
-
-# ── Agent Autonomy ─────────────────────────────────────────────────────────────
+# ── Agent ──────────────────────────────────────────────────────────────────────
 [agent]
-autonomy = "supervised"          # readonly | supervised | full
-# supervised: agent can initiate (CRON check-ins) but asks before tool actions
+max_history_messages  = 50
+max_context_tokens    = 32000
+max_tool_iterations   = 10
 
-# ── Tools ──────────────────────────────────────────────────────────────────────
-[tools]
-enabled = ["cron", "memory"]     # Enabled tools for this instance
+# ── Storage ────────────────────────────────────────────────────────────────────
+[storage]
+# Workspace is mounted at /workspace — ZeroClaw writes db, logs here automatically
 
-[tools.shell]
-enabled = false                  # Explicitly disabled — security: no shell access in container
-
-# ── Hands (Multi-Agent Personalities) ─────────────────────────────────────────
-[[hands.personalities]]
-name    = "ProductivityCoach"
-default = true
-system_prompt_file = "/workspace/prompts/productivity_coach.md"
-
-# ── Logging ────────────────────────────────────────────────────────────────────
-[logging]
-path            = "/workspace/logs/zeroclaw.log"
-level           = "info"         # debug | info | warn | error
-rotate          = true
-rotate_max_size_mb = 50
+# ── Cost Guard ─────────────────────────────────────────────────────────────────
+[cost]
+# Prevent runaway costs per agent
+# Uncomment and adjust as needed:
+# daily_limit_usd = 1.0
+# per_message_limit_usd = 0.05

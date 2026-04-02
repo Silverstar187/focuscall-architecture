@@ -27,7 +27,10 @@ from login to a live, responding Telegram bot in under 5 minutes.
   2. Running `pytest` against `provision.py` and `webhook-receiver.py` returns green (core paths covered)
   3. `.env.local` contains correct `WEBHOOK_SECRET` and `VPS_WEBHOOK_URL` values — no placeholder strings
   4. Logged-in user sees their agent list on the dashboard profile page
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Fix .env.local, enable systemd persistence, verify Supabase RLS
+- [ ] 01-02-PLAN.md — Create pytest test suite for provision.py and webhook-receiver.py
 
 ### Phase 2: AI Generation Pipeline
 **Goal**: User describes an agent (text or voice) and gets all 5 ZeroClaw config files generated and saved
@@ -78,7 +81,7 @@ from login to a live, responding Telegram bot in under 5 minutes.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure Baseline | 0/TBD | Not started | - |
+| 1. Infrastructure Baseline | 0/2 | Planning complete | - |
 | 2. AI Generation Pipeline | 0/TBD | Not started | - |
 | 3. Credentials & Vault | 0/TBD | Not started | - |
 | 4. Provisioning Integration | 0/TBD | Not started | - |

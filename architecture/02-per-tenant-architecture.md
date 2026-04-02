@@ -10,42 +10,37 @@ Every user gets a **completely isolated process and filesystem**. There is no sh
 
 | Resource | Isolation Level |
 |----------|----------------|
-| ZeroClaw process | 1 systemd service per user |
-| SurrealDB | 1 embedded DB per user (separate directory) |
-| Configuration | 1 config.toml per user |
-| Port | 1 assigned port per user (42000 + N) |
-| Filesystem | Separate directory tree per user |
-| Logs | Separate log file per user |
+| ZeroClaw process | 1 Docker Container per Agent (fc-{user_id}-{agent_id}) |
+| SurrealDB/SQLite | 1 embedded DB per Agent (separate /workspace/db/) |
+| Configuration | 1 config.toml per Agent (in /workspace, keine Keys) |
+| Port | 1 assigned port per Agent (42000 + N, aus registry.json) |
+| Filesystem | Separate /workspace Volume per Agent |
+| Logs | Separate /workspace/logs/ per Agent |
+| Keys | Nur als Docker ENV — nie auf Disk geschrieben |
 
 ---
 
-## Directory Structure
+## Directory Structure (VPS)
 
 ```
 /opt/focuscall/
-├── users/
-│   ├── {user_id_1}/
-│   │   ├── config.toml          # ZeroClaw configuration (bot_token, llm_key, port, ...)
-│   │   ├── db/                  # SurrealDB embedded data files
-│   │   │   ├── data.db          # Main database file
-│   │   │   └── wal/             # Write-ahead log
-│   │   ├── files/               # User-uploaded files, documents, exports
-│   │   │   └── uploads/
-│   │   └── logs/                # Process logs for this user's instance
-│   │       └── zeroclaw.log
-│   ├── {user_id_2}/
-│   │   └── ...
-│   └── {user_id_N}/
-│       └── ...
-├── ontologies/                  # Shared read-only Turtle ontology files
-│   ├── health.ttl
-│   ├── finance.ttl
-│   ├── productivity.ttl
-│   └── relationships.ttl
-├── registry.json                # Port assignment registry (user_id → port mapping)
-├── provision.sh                 # Provisioning script
-└── deprovision.sh               # Cleanup script
+├── workspaces/
+│   ├── {user_id}/
+│   │   └── {agent_id}/
+│   │       ├── config.toml      # ZeroClaw Config (KEINE Secrets — kommen aus Docker ENV)
+│   │       ├── db/              # SQLite Memory (brain.db)
+│   │       └── logs/            # zeroclaw.log
+│   └── ...
+├── registry.json                # Port-Registry (next_port + instances)
+└── provisioning/
+    ├── webhook-receiver.py      # FastAPI :9000
+    ├── provision.py             # Docker SDK Logik
+    ├── config.toml.tmpl         # Template ohne Keys
+    └── Dockerfile               # ZeroClaw multi-stage ARM64 Build
 ```
+
+> **Hinweis:** Keys (bot_token, llm_key) kommen **ausschließlich** als Docker ENV-Variablen
+> in den Container — sie werden nie in config.toml oder auf Disk geschrieben.
 
 The `ontologies/` directory is **read-only shared** — all users share the same base ontology definitions. Per-user knowledge graph data lives in their `db/` directory.
 

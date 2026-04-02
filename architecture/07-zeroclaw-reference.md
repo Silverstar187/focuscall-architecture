@@ -8,7 +8,7 @@
 
 ZeroClaw is a Rust-based, multi-channel AI agent runtime distributed as a single binary. It handles channel adapters (Telegram, WhatsApp, etc.), LLM routing, tool execution, session management, and multi-agent personalities ("Hands") — all without requiring a container, a runtime, or a language interpreter.
 
-**Source:** [b0xtch/zeroclaw](https://github.com/b0xtch/zeroclaw) fork — closed-source binary distribution. No access to source code. Configured entirely via `config.toml`.
+**Source:** [zeroclaw-labs/zeroclaw](https://github.com/zeroclaw-labs/zeroclaw) — original repository, open source (Rust). Built from source via Dockerfile.
 
 ---
 

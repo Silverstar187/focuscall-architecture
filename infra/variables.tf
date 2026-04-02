@@ -19,5 +19,5 @@ variable "webhook_secret" {
 variable "zeroclaw_repo" {
   description = "ZeroClaw GitHub repo to clone"
   type        = string
-  default     = "https://github.com/b0xtch/zeroclaw"
+  default     = "https://github.com/zeroclaw-labs/zeroclaw"
 }

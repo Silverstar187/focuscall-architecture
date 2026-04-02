@@ -5,7 +5,7 @@
 #   docker build -t zeroclaw:latest .
 #   docker buildx build --platform linux/arm64 -t zeroclaw:latest .
 #
-# Source: https://github.com/b0xtch/zeroclaw
+# Source: https://github.com/zeroclaw-labs/zeroclaw
 
 # ══════════════════════════════════════════════════════════════════
 # Stage 1: Builder
@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone ZeroClaw source
-RUN git clone --depth 1 https://github.com/b0xtch/zeroclaw.git /build
+RUN git clone --depth 1 https://github.com/zeroclaw-labs/zeroclaw.git /build
 
 WORKDIR /build
 

@@ -1,6 +1,6 @@
 # ZeroClaw / focuscall.ai
 
-KI-Agent Infrastructure für Telegram-Bot Coaching auf Basis von [ZeroClaw](https://github.com/b0xtch/zeroclaw).
+KI-Agent Infrastructure für Telegram-Bot Coaching auf Basis von [ZeroClaw](https://github.com/zeroclaw-labs/zeroclaw).
 
 ---
 

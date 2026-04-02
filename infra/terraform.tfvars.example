@@ -4,4 +4,4 @@
 hcloud_token        = "your-hetzner-api-token"
 ssh_public_key_path = "~/.ssh/openclaw_nopass.pub"
 webhook_secret      = "generate-with: python3 -c 'import secrets; print(secrets.token_hex(32))'"
-zeroclaw_repo       = "https://github.com/b0xtch/zeroclaw"
+zeroclaw_repo       = "https://github.com/zeroclaw-labs/zeroclaw"

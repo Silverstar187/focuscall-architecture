@@ -9,7 +9,7 @@
 
 - [x] **AUTH-01**: User kann sich mit Email/Passwort registrieren und einloggen *(existiert)*
 - [x] **AUTH-02**: User-Session bleibt über Browser-Refresh erhalten *(existiert)*
-- [ ] **AUTH-03**: User hat ein Profil mit Agentenliste im Dashboard
+- [x] **AUTH-03**: User hat ein Profil mit Agentenliste im Dashboard
 
 ### Agent Configuration
 
@@ -43,7 +43,7 @@
 
 - [x] **INFRA-01**: ZeroClaw Docker Image gebaut (ARM64, v0.6.7) *(existiert)*
 - [x] **INFRA-02**: Webhook Receiver läuft auf VPS (:9000, HMAC-Validierung) *(existiert)*
-- [ ] **INFRA-03**: Webhook Receiver überlebt Server-Neustart (systemctl enable)
+- [x] **INFRA-03**: Webhook Receiver überlebt Server-Neustart (systemctl enable)
 - [x] **INFRA-04**: Backend hat Tests (provision.py, webhook-receiver.py)
 
 ## v2 Requirements (Milestone 2+)
@@ -87,7 +87,7 @@
 |-------------|-------|--------|
 | AUTH-01 | — | ✓ Complete |
 | AUTH-02 | — | ✓ Complete |
-| AUTH-03 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Complete |
 | CONF-01 | Phase 2 | Pending |
 | CONF-02 | Phase 2 | Pending |
 | CONF-03 | Phase 2 | Pending |
@@ -106,7 +106,7 @@
 | DASH-03 | Phase 5 | Pending |
 | INFRA-01 | — | ✓ Complete |
 | INFRA-02 | — | ✓ Complete |
-| INFRA-03 | Phase 1 | Pending |
+| INFRA-03 | Phase 1 | Complete |
 | INFRA-04 | Phase 1 | Complete |
 
 **Coverage:**

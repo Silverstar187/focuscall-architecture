@@ -1,12 +1,26 @@
 # focuscall.ai Provisioning System
 
 Vollstaendiges Provisioning-System fuer focuscall.ai auf Hetzner CAX21 (ARM64).
+**Architektur: 1 Docker Container pro User-Agent-Paar** — vollstaendig isoliert, mit eigenem Port und Ressourcen-Limits.
+
 Keys werden verschluesselt in Supabase Vault gespeichert und NUR als Docker ENV-Variablen
 an ZeroClaw-Container uebergeben — nie auf VPS-Disk.
 
 ---
 
 ## Architektur-Ueberblick
+
+### Multi-Container Design: 1 Container = 1 Agent
+
+Anders als viele andere Systeme, die einen einzelnen Container mit mehreren Agent-Instanzen nutzen,
+startet ZeroClaw für **jeden Agenten einen eigenen Docker Container**. Das bietet:
+
+- **Vollständige Isolation**: Ein abstürzender Agent beeinflusst keine anderen
+- **Ressourcen-Garantien**: Jeder Container hat fixe Limits (128MB RAM, 0.5 CPU)
+- **Unabhängige Updates**: Einzelne Agenten können neu gestartet werden
+- **Sicherheit**: API Keys existieren nur im jeweiligen Container Memory
+
+### System-Flow
 
 ```
 User Browser

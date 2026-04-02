@@ -92,10 +92,10 @@
 | CONF-02 | Phase 2 | Pending |
 | CONF-03 | Phase 2 | Pending |
 | CONF-04 | Phase 2 | Pending |
-| CONF-05 | Phase 3 | Pending |
-| CRED-01 | Phase 2 | Pending |
-| CRED-02 | Phase 2 | Pending |
-| CRED-03 | Phase 2 | Pending |
+| CONF-05 | Phase 5 | Pending |
+| CRED-01 | Phase 3 | Pending |
+| CRED-02 | Phase 3 | Pending |
+| CRED-03 | Phase 3 | Pending |
 | PROV-01 | Phase 4 | Pending |
 | PROV-02 | Phase 4 | Pending |
 | PROV-03 | Phase 4 | Pending |
@@ -107,7 +107,7 @@
 | INFRA-01 | — | ✓ Complete |
 | INFRA-02 | — | ✓ Complete |
 | INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 6 | Pending |
+| INFRA-04 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
@@ -117,4 +117,4 @@
 
 ---
 *Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after initial definition*
+*Last updated: 2026-04-02 — traceability updated after roadmap creation*

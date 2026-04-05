@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tmux new-session:*)",
+      "Bash(tmux list-sessions:*)",
+      "Bash(tmux capture-pane:*)",
+      "Bash(tmux send-keys -t main 'Teste ob Docker-Container-Spawning auf dem Server funktioniert. Hier ist der Kontext::*)",
+      "Bash(tmux new-window:*)",
+      "Bash(tmux send-keys:*)",
+      "Bash(tmux list-windows:*)",
+      "Bash(tmux select-window:*)"
+    ]
+  }
+}
